@@ -1,7 +1,6 @@
-module.exports.loop = function () {
+var testing = require('spawner');
 
-    for(var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        roleHarvester.run(creep);
-    }
+module.exports.loop = function () {
+    testing.print();
+    
 }
