@@ -23,7 +23,7 @@ module.exports = {
                     var spot = {
                         x : x,
                         y : y,
-                        assigned : undefined
+                        assigned : null
                     };
                     spots.push(spot);
                 }

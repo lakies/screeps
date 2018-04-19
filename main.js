@@ -9,6 +9,9 @@ module.exports.loop = function () {
     if(Memory.spawns === undefined){
         Memory.spawns = Game.spawns;
     }
+    if(Memory.freeWorkers === undefined){
+        Memory.freeWorkers = [];
+    }
 
     for(var name in Game.spawns){
         var spawn = Game.spawns[name];

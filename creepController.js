@@ -10,7 +10,7 @@
 module.exports = {
     run: function(creep){
         if(creep.memory.job !== undefined){
-            //this is a test line to test committing to file
+
         }
     }
 };
