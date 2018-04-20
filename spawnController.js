@@ -9,6 +9,11 @@ var utils = require("utils");
 module.exports = {
     run: function(spawn){
 
+        if(!Memory.spawns[spawn.name]){
+            console.log("didn't add spawn to memory");
+            Memory.spawns[spawn.name] = Game.spawns[spawn.name];
+        }
+
         var mem = Memory.spawns[spawn.name];
 
         if(mem.sources === undefined){
@@ -31,7 +36,7 @@ module.exports = {
                 //kui ei ole, siis vaata kas saab ehitada
                 //kui ei saa ehitada, siis lisa generic miner job
             }
-        }else{//vaata mitu kohta on kÃµrval ja vastavalt sellel lisa tÃ¶id
+        }else{//vaata mitu kohta on kÃÂµrval ja vastavalt sellel lisa tÃÂ¶id
             for(var s in mem.sources){
                 var source = mem.sources[s];
 
@@ -40,24 +45,35 @@ module.exports = {
                 }
 
                 for(var i in source.freeSpots){
-                    var spot = source.freeSpots[i];
+                    var spot = source.freeSpots[i];//TODO: add support for positions in other rooms, maybe use pos class for that
                     if(spot.assigned === null){//check if spot does not have a miner assigned
-                        if(Memory.freeWorkers.length === 0 && Memory.jobs.filter(function (job) {
-                                return job.spot !== undefined && job.spot === spot;
-                            }).length === 0){//if there is free worker then add there is not already a job queued then add job
-                            Memory.jobs.push({
-                                type: 'genericMining',
-                                receiver: 'worker',
-                                spot: spot,
-                                target: source
-                            });
+                        var job = {
+                            type: 'genericMining',
+                            receiver: 'worker',
+                            spot: spot,
+                            target_id: source.id
+                        };
+
+                        if(Memory.freeWorkers.length === 0 && Memory.jobs.filter(function (job1) {
+                                return JSON.stringify(job1.spot) === JSON.stringify(job.spot);
+                            }).length === 0){//if there is free worker then and there isn't already a job queued then add job
+                            Memory.jobs.push(job);
                         }else{//if not then check if a creep has this spot as lastspot i.e. it last mined there
-                            var lastWorkers = mem.creeps.filter(function (creep) {
-                                return creep.memory.lastSpot !== undefined && creep.memory.lastSpot === spot;
-                            });
+                            var lastWorkers = [];
+
+                            for(var i in mem.creeps){
+                                var creep = mem.creeps[i];
+                                if(creep.memory.lastSpot !== undefined && JSON.stringify(creep.memory.lastSpot) === JSON.stringify(spot)){
+                                    lastWorkers.push(creep);
+                                }
+                            }
 
                             if(lastWorkers.length > 0){
-                                Memory
+                                lastWorkers[0].nextJob = job;
+                            }else if(Memory.spawningQueue.filter(function (obj) {
+                                    return JSON.stringify(obj.memory.job) === JSON.stringify(job);
+                                }).length === 0) {//if no creeps with last job as this spot then add spawning queue if not already spawning
+                                Memory.spawningQueue.push({type: 'worker', memory: {job: job, spawn: spawn.name}});
                             }
                         }
                     }

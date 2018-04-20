@@ -9,7 +9,7 @@
 
 module.exports = {
 
-    findFreeSpots: function(source){//finds empty tiles around source
+    findFreeSpots: function(source){//finds empty tiles around source, maybe limit to 4
         var p = source.pos;
         var spots = [];
         for(var x = Math.max(p.x - 1,0); x < Math.min(p.x + 2, 50); x++){
@@ -30,5 +30,20 @@ module.exports = {
             }
         }
         return spots;
+    },
+
+    initializeMemory: function(){
+        if(!Memory.spawningQueue){
+            Memory.spawningQueue = [];
+        }
+        if(!Memory.jobs){
+            Memory.jobs = [];
+        }
+        if(!Memory.spawns){
+            Memory.spawns = Game.spawns;
+        }
+        if(!Memory.freeWorkers){
+            Memory.freeWorkers = [];
+        }
     }
 };
