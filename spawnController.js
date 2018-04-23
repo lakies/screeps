@@ -6,6 +6,7 @@ later add support for more than one spawn per room
 
 var utils = require("utils");
 
+
 module.exports = {
     run: function(spawn){
 
@@ -30,13 +31,15 @@ module.exports = {
             }
         }
 
+
+
         if(spawn.room.controller.level >= 3){//can build miners
             for(var s in mem.sources){
                 //vaata kas miner on olemas
                 //kui ei ole, siis vaata kas saab ehitada
                 //kui ei saa ehitada, siis lisa generic miner job
             }
-        }else{//vaata mitu kohta on kÃÂµrval ja vastavalt sellel lisa tÃÂ¶id
+        }else{//vaata mitu kohta on kÃÂÃÂµrval ja vastavalt sellel lisa tÃÂÃÂ¶id
             for(var s in mem.sources){
                 var source = mem.sources[s];
 
@@ -46,7 +49,7 @@ module.exports = {
 
                 for(var i in source.freeSpots){
                     var spot = source.freeSpots[i];//TODO: add support for positions in other rooms, maybe use pos class for that
-                    if(spot.assigned === null){//check if spot does not have a miner assigned
+                    if(!spot.assigned){//check if spot does not have a miner assigned
                         var job = {
                             type: 'genericMining',
                             receiver: 'worker',
@@ -61,8 +64,8 @@ module.exports = {
                         }else{//if not then check if a creep has this spot as lastspot i.e. it last mined there
                             var lastWorkers = [];
 
-                            for(var i in mem.creeps){
-                                var creep = mem.creeps[i];
+                            for(var i in Game.creeps){
+                                var creep = Game.creeps[i];
                                 if(creep.memory.lastSpot !== undefined && JSON.stringify(creep.memory.lastSpot) === JSON.stringify(spot)){
                                     lastWorkers.push(creep);
                                 }

@@ -10,7 +10,38 @@
 module.exports = {
     run: function(creep){
         if(creep.memory.job !== undefined){
-
+            switch(creep.memory.job.type){
+                case 'genericMiner':
+                    this.genericMiner(creep);
+                    break;
+                case 'miner':
+                    this.miner(creep);
+                    break;
+                case 'hauler':
+                    this.hauler(creep);
+                    break;
+                case 'mover':
+                    this.mover(creep);
+                    break;
+            }
         }
+    },
+
+    miner: function(creep){
+
+    },
+
+    genericMiner: function (creep) {
+
+    },
+
+    hauler: function (creep) {
+
+    },
+
+    mover: function (creep) {
+
     }
+
+
 };

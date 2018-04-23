@@ -20,12 +20,18 @@ module.exports = {
                     }
                     return false;
                 }).length === 0){
-                    var spot = {
+                    var spot1 = {
                         x : x,
                         y : y,
-                        assigned : null
+                        room : source.room.name,
+                        assigned : false
                     };
-                    spots.push(spot);
+
+                    if(_.filter(Game.creeps,function (creep) {
+                            return creep.memory.job.spot && JSON.stringify(spot1) === JSON.stringify(creep.memory.job.spot);
+                        }).length > 0) spot1.assigned = true;
+
+                    spots.push(spot1);
                 }
             }
         }
@@ -45,5 +51,21 @@ module.exports = {
         if(!Memory.freeWorkers){
             Memory.freeWorkers = [];
         }
+    },
+
+    hash: function(s) {
+        /* Simple hash function. */
+        var a = 1, c = 0, h, o;
+        if (s) {
+            a = 0;
+            /*jshint plusplus:false bitwise:false*/
+            for (h = s.length - 1; h >= 0; h--) {
+                o = s.charCodeAt(h);
+                a = (a<<6&268435455) + o + (o<<14);
+                c = a & 266338304;
+                a = c!==0?a^c>>21:a;
+            }
+        }
+        return String(a);
     }
 };
