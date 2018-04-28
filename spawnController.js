@@ -39,7 +39,7 @@ module.exports = {
                 //kui ei ole, siis vaata kas saab ehitada
                 //kui ei saa ehitada, siis lisa generic miner job
             }
-        }else{//vaata mitu kohta on kÃÂÃÂµrval ja vastavalt sellel lisa tÃÂÃÂ¶id
+        }else{//vaata mitu kohta on k6rval ja vastavalt sellel lisa toid
             for(var s in mem.sources){
                 var source = mem.sources[s];
 
@@ -48,7 +48,7 @@ module.exports = {
                 }
 
                 for(var i in source.freeSpots){
-                    var spot = source.freeSpots[i];//TODO: add support for positions in other rooms, maybe use pos class for that
+                    var spot = source.freeSpots[i];//TODO: add support for positions in other rooms, maybe use pos class for that || done already i think
                     if(!spot.assigned){//check if spot does not have a miner assigned
                         var job = {
                             type: 'genericMining',

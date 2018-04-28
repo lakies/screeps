@@ -8,7 +8,7 @@
  */
 
 module.exports = {
-
+    maxSpots: 1,
     findFreeSpots: function(source){//finds empty tiles around source, maybe limit to 4
         var p = source.pos;
         var spots = [];
@@ -32,6 +32,7 @@ module.exports = {
                         }).length > 0) spot1.assigned = true;
 
                     spots.push(spot1);
+                    if(spots.length >= this.maxSpots) return spots;
                 }
             }
         }
