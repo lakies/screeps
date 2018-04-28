@@ -66,7 +66,7 @@ module.exports = {
 
                             for(var i in Game.creeps){
                                 var creep = Game.creeps[i];
-                                if(creep.memory.lastSpot !== undefined && JSON.stringify(creep.memory.lastSpot) === JSON.stringify(spot)){
+                                if(creep.memory.lastJob !== undefined && JSON.stringify(creep.memory.lastJob) === JSON.stringify(job)){
                                     lastWorkers.push(creep);
                                 }
                             }
@@ -76,7 +76,7 @@ module.exports = {
                             }else if(Memory.spawningQueue.filter(function (obj) {
                                     return JSON.stringify(obj.memory.job) === JSON.stringify(job);
                                 }).length === 0) {//if no creeps with last job as this spot then add spawning queue if not already spawning
-                                Memory.spawningQueue.push({type: 'worker', memory: {job: job, spawn: spawn.name}});
+                                Memory.spawningQueue.push({type: 'worker', memory: {job: job, spawn: spawn.name, type:'worker'}});
                             }
                         }
                     }

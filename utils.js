@@ -8,8 +8,8 @@
  */
 
 module.exports = {
-    maxSpots: 1,
-    findFreeSpots: function(source){//finds empty tiles around source, maybe limit to 4
+    maxSpots: 9, // revise limit
+    findFreeSpots: function(source){//finds empty tiles around source
         var p = source.pos;
         var spots = [];
         for(var x = Math.max(p.x - 1,0); x < Math.min(p.x + 2, 50); x++){
@@ -23,7 +23,7 @@ module.exports = {
                     var spot1 = {
                         x : x,
                         y : y,
-                        room : source.room.name,
+                        roomName : source.room.name,
                         assigned : false
                     };
 

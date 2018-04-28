@@ -40,7 +40,7 @@ module.exports = {
 
             var result = spawn.spawnCreep(body,name,{memory:memory, dryRun: true});
 
-            if(result !== -6 && result !== -4){
+            if(result === 0){
                 console.log('Creep ' + name + ' spawning with code ' + result);
                 spawn.spawnCreep(body,name,{memory:memory});
 
