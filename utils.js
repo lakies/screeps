@@ -8,7 +8,7 @@
  */
 
 module.exports = {
-    findFreeSpots: function (source) {//places a flag near source for mining
+    flagSources: function (source, spawnName) {//places a flag near source for mining
         var p = source.pos;
         for (var x = Math.max(p.x - 1, 0); x < Math.min(p.x + 2, 50); x++) {
             for (var y = Math.max(p.y - 1, 0); y < Math.min(p.y + 2, 50); y++) {
@@ -18,14 +18,16 @@ module.exports = {
                     }).length === 0) {
                     var spot = new RoomPosition(x, y, source.room.name);
 
-                    this.placeFlag(spot, {memory: {type: 'miningSpot'}, color1: COLOR_YELLOW});
+                    this.placeFlag(spot, {
+                        memory: {type: 'miningSpot', spawn: spawnName, assignedMiner: null},
+                        color1: COLOR_YELLOW
+                    });
                     this.placeFlag(spot, {
                         memory: {type: 'build', structure: STRUCTURE_CONTAINER},
                         color1: COLOR_ORANGE,
                         color2: COLOR_BLUE
                     });
 
-                    Memory.rooms[p.roomName].flaggedSources++;
                     return;
                 }
             }

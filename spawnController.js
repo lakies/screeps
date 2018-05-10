@@ -17,9 +17,17 @@ module.exports = {
 
         var mem = Memory.spawns[spawn.name];
 
-        if (mem.sources === undefined) {
-            mem.sources = spawn.room.find(FIND_SOURCES);
+        if(!mem.oneTime){//stuff to do only on setup, maybe move to another place
+            mem.oneTime = true;
+
+            var sources = spawn.room.find(FIND_SOURCES);
+            for(var i in sources){
+                console.log('Flagging source');
+                utils.flagSources(sources[i],spawn.name);
+            }
         }
+
+
 
         if (mem.creeps === undefined) {//if spawning new creep then should probably add creep manually to mem because this does not update automatically
             mem.creeps = {};
@@ -39,7 +47,13 @@ module.exports = {
 
     miningOp: function (spawn) {
         //TODO: if spawning miners then first job should be move to target flag
+        var unassigned = _.filter(Game.flags,function (flag) {
+            return Memory.flags[flag.name].spawn === spawn.name && Memory.flags[flag.name].assignedMiner === null;
+        });
 
+        if(unassigned.length > 0){
+
+        }
     },
 
     maintenanceOp: function (spawn) {//builds, repairs and upgrades
