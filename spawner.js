@@ -37,8 +37,8 @@ module.exports = {
                     break;
                 case 'miner':
                     body.push(MOVE);
-                    for (var i = 0; i < Math.min((spawn.energyCapacity - Constants.BODYPART_COST.move)); i++) {
-
+                    for (var i = 0; i < Math.min(Math.floor((spawn.energyCapacity - BODYPART_COST.move) / BODYPART_COST.work), 5); i++) {
+                        body.push(WORK);
                     }
                     break;
             }

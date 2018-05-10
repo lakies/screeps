@@ -7,13 +7,13 @@ module.exports.loop = function () {
 
     utils.initializeMemory();
     //TODO: check if unused creep in memory
-    for(var name in Game.spawns){
+    for (var name in Game.spawns) {
         var spawn = Game.spawns[name];
         spawnController.run(spawn);
         spawner.run(spawn);
     }
 
-    for(var name in Game.creeps){
+    for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         creepController.run(creep);
     }

@@ -8,40 +8,33 @@
  */
 
 module.exports = {
-    maxSpots: 9, // revise limit
-    findFreeSpots: function (source) {//finds empty tiles around source
+    findFreeSpots: function (source) {//places a flag near source for mining
         var p = source.pos;
-        var spots = [];
         for (var x = Math.max(p.x - 1, 0); x < Math.min(p.x + 2, 50); x++) {
             for (var y = Math.max(p.y - 1, 0); y < Math.min(p.y + 2, 50); y++) {
                 if (Game.getObjectById(source.id).room.lookAt(x, y).filter(function (a) {
-                        if (a.type === "terrain" && a.terrain === "wall") {
-                            return true;
-                        }
-                        return false;
+                        return a.type === "terrain" && a.terrain === "wall";
+
                     }).length === 0) {
-                    var spot1 = {
-                        x: x,
-                        y: y,
-                        roomName: source.room.name,
-                        assigned: false
-                    };
+                    var spot = new RoomPosition(x, y, source.room.name);
 
-                    if (_.filter(Game.creeps, function (creep) {
-                            return creep.memory.job.spot && JSON.stringify(spot1) === JSON.stringify(creep.memory.job.spot);
-                        }).length > 0) spot1.assigned = true;
+                    this.placeFlag(spot, {memory: {type: 'miningSpot'}, color1: COLOR_YELLOW});
+                    this.placeFlag(spot, {
+                        memory: {type: 'build', structure: STRUCTURE_CONTAINER},
+                        color1: COLOR_ORANGE,
+                        color2: COLOR_BLUE
+                    });
 
-                    spots.push(spot1);
-                    if (spots.length >= this.maxSpots) return spots;
+                    Memory.rooms[p.roomName].flaggedSources++;
+                    return;
                 }
             }
         }
-        return spots;
     },
 
     placeFlag: function (pos, args) {
         var newName = "Flag" + Memory.lastFlag++;
-        Game.rooms[pos.roomName].createFlag(new RoomPosition(pos.x, pos.y, pos.roomName),newName,args.color1,args.color2);
+        Game.rooms[pos.roomName].createFlag(new RoomPosition(pos.x, pos.y, pos.roomName), newName, args.color1, args.color2);
         Game.flags[newName].memory = args.memory;
     },
 

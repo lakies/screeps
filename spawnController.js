@@ -31,65 +31,14 @@ module.exports = {
             }
         }
 
+        this.miningOp(spawn);
 
-        if (spawn.room.controller.level >= 3) {//can build miners
-            for (var s in mem.sources) {
-                //vaata kas miner on olemas
-                //kui ei ole, siis vaata kas saab ehitada
-                //kui ei saa ehitada, siis lisa generic miner job
-            }
-        } else {//vaata mitu kohta on k6rval ja vastavalt sellel lisa toid
-            for (var s in mem.sources) {
-                var source = mem.sources[s];
-
-                if (source.freeSpots === undefined) {
-                    source.freeSpots = utils.findFreeSpots(source);
-                }
-
-                for (var i in source.freeSpots) {
-                    var spot = source.freeSpots[i];
-                    if (!spot.assigned) {//check if spot does not have a miner assigned
-                        var job = {
-                            type: 'genericMining',
-                            receiver: 'worker',
-                            spot: spot,
-                            target_id: source.id
-                        };
-
-                        if (Memory.freeWorkers.length === 0 && Memory.jobs.filter(function (job1) {
-                                return JSON.stringify(job1.spot) === JSON.stringify(job.spot);
-                            }).length === 0) {//if there is free worker then and there isn't already a job queued then add job
-                            Memory.jobs.push(job);
-                        } else {//if not then check if a creep has this spot as lastspot i.e. it last mined there
-                            var lastWorkers = [];
-
-                            for (var i in Game.creeps) {
-                                var creep = Game.creeps[i];
-                                if (creep.memory.lastJob !== undefined && JSON.stringify(creep.memory.lastJob) === JSON.stringify(job)) {
-                                    lastWorkers.push(creep);
-                                }
-                            }
-
-                            if (lastWorkers.length > 0) {
-                                lastWorkers[0].nextJob = job;
-                            } else if (Memory.spawningQueue.filter(function (obj) {
-                                    return JSON.stringify(obj.memory.job) === JSON.stringify(job);
-                                }).length === 0) {//if no creeps with last job as this spot then add spawning queue if not already spawning
-                                Memory.spawningQueue.push({
-                                    type: 'worker',
-                                    memory: {job: job, spawn: spawn.name, type: 'worker'}
-                                });
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
+        this.maintenanceOp(spawn);
 
     },
 
     miningOp: function (spawn) {
+        //TODO: if spawning miners then first job should be move to target flag
 
     },
 
