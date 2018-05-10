@@ -40,8 +40,10 @@ module.exports = {
 
         if (creep.pos.isEqualTo(newPos) || (job.toNear && creep.pos.isNearTo(newPos))) {
             creep.memory.job = job.nextJob; //it may be undefined, use that for idle creeps?
-            if(creep.memory.trackTime){
-                creep.memory.arriveTime = Game.time - creep.memory.spawntime;
+            if (creep.memory.trackTime) {
+                creep.memory.arriveTime = Game.time - creep.memory.spawnTime;
+                creep.memory.trackTime = undefined;
+                creep.memory.spawnTime = undefined;
             }
         } else {
             creep.moveTo(newPos);
@@ -53,9 +55,13 @@ module.exports = {
     //High level tasks
     miner: function (creep) {
         var job = creep.memory.job;
+
+        if (creep.memory.arriveTime > creep.ticksToLive) {
+            Game.flags[creep.memory.flag].memory.assignedMiner = null;
+        }
+
         var result = creep.harvest(Game.getObjectById(job.target_id));
 
-        
         if (result === ERR_NOT_IN_RANGE) {
             creep.memory.job = {type: 'move', toPos: job.spot, nextJob: job}
         }
@@ -89,11 +95,50 @@ module.exports = {
         }
     },
 
+    haulerStates: {//use same logic for other types?
+        STATE_REFILL: 0,
+        STATE_FILL_STRUCTS: 1
+    },
+
     hauler: function (creep) { //job is to get energy from miner and fill structures
         //TODO: first check for empty structures, then if full upgrade controller
         //TODO: note down somewhere how many energy is delivered to a structure to avoid overfilling
+        var job = creep.memory.job;
 
+        if (creep.memory.state === this.haulerStates.STATE_REFILL) {
+            var target = _.filter(Game.flags[job.targets[job.lastTargetIndex].name].pos.look(), function (obj) {
+                return obj.type === 'resource';
+            })[0].resource;
 
+            var result = creep.pickup(target);
+            if (result === ERR_NOT_IN_RANGE) {
+                creep.memory.job = {type: 'move', toPos: target.pos, toNear: true, nextJob: job};
+            } else if (result === OK || result === ERR_FULL) {
+                job.lastTargetIndex = (job.lastTargetIndex + 1) % job.targets.length;
+                if (creep.carry.energy === creep.carryCapacity) {
+                    creep.memory.state = this.haulerStates.STATE_FILL_STRUCTS;
+                }
+            }
+        } else if (creep.memory.state === this.haulerStates.STATE_FILL_STRUCTS) {//assumes only energy in containers
+            var targets = creep.room.find(FIND_STRUCTURES).filter(function (structure) {
+                return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_STORAGE) && structure.energy < structure.energyCapacity;
+            });
+
+            targets.sort(function (a, b) {
+                var x = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_STORAGE];
+                return x.indexOf(a.structureType) - x.indexOf(b.structureType);
+            });
+
+            var result = creep.transfer(targets[0], RESOURCE_ENERGY);
+
+            if (result === ERR_NOT_IN_RANGE) {
+                creep.memory.job = {type: 'move', toPos: targets[0].pos, toNear: true, nextJob: job};
+            } else if (result === OK && creep.carry.energy === 0 || result === ERR_NOT_ENOUGH_RESOURCES) {
+                creep.memory.state = this.haulerStates.STATE_REFILL;
+            } else if (result !== OK) {
+                console.log('Error in transfer: ', result);
+            }
+        }
     },
 
     mover: function (creep) {
@@ -114,7 +159,7 @@ module.exports = {
                     creep.memory.job = creep.memory.lastJob;
                     creep.memory.lastJob = undefined;
                 } else {
-                    creep.memory.job === undefined;
+                    creep.memory.job = undefined;
                     Memory.freeWorkers.push(creep.name);
                 }
 

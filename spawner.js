@@ -15,11 +15,12 @@ module.exports = {
     sortMem: function () {
         Memory.spawningQueue.sort(function (a, b) {
             var x = ['worker', 'miner', 'hauler'];
-            return x.indexOf(a.type) - x.indexOf(b.type);
+            return x.indexOf(b.type) - x.indexOf(a.type);
         });
     },
 
     run: function (spawn) {//add back to mem if cant spawn
+        if(spawn.spawning) return;
         this.sortMem();
 
         var newCreep = Memory.spawningQueue.pop();
@@ -36,9 +37,14 @@ module.exports = {
                     }
                     break;
                 case 'miner':
-                    body.push(MOVE);
-                    for (var i = 0; i < Math.min(Math.floor((spawn.energyCapacity - BODYPART_COST.move) / BODYPART_COST.work), 5); i++) {
-                        body.push(WORK);
+
+                    for (var i = 0; i < Math.min(Math.floor(spawn.energyCapacity / (BODYPART_COST.work * 2 + BODYPART_COST.move)), 3); i++) {
+                        body = body.concat([MOVE,WORK,WORK]);
+                    }
+                    break;
+                case 'hauler':
+                    for (var i = 0; i < Math.min(Math.floor(spawn.energyCapacity / (BODYPART_COST.carry + BODYPART_COST.move)), 8); i++) {//may need more than 8
+                        body = body.concat([MOVE,CARRY]);
                     }
                     break;
             }
@@ -51,7 +57,7 @@ module.exports = {
             }
 
             var result = spawn.spawnCreep(body, name, {memory: memory, dryRun: true});
-
+            console.log(result);
             if (result === 0) {
                 console.log('Creep ' + name + ' spawning with code ' + result);
                 spawn.spawnCreep(body, name, {memory: memory});

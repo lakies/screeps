@@ -113,7 +113,7 @@ module.exports = {
     },
 
     genCreepName: function () {
-        return this.hash(Date.now());
+        return this.hash(Date.now().toString() + Math.random().toString());
     }
 
 };

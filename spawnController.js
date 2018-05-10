@@ -45,7 +45,7 @@ module.exports = {
     },
 
     miningOp: function (spawn) {
-        //TODO: if spawning miners then first job should be move to target flag
+        //TODO: add support for other rooms
         var unassigned = _.filter(Game.flags, function (flag) {
             return Memory.flags[flag.name].type === 'miningSpot' && Memory.flags[flag.name].spawn === spawn.name && Memory.flags[flag.name].assignedMiner === null;
         });
@@ -71,6 +71,7 @@ module.exports = {
                         job: {type: 'move', toPos: job.spot, nextJob: job},
                         spawn: spawn.name,
                         type: 'miner',
+                        flag: flag.name,
                         trackTime: true,
                         spawnTime: Game.time
                     }
@@ -79,7 +80,27 @@ module.exports = {
 
         }
 
-
+        //i think one hauler per room is fine
+        if (!spawn.room.memory.hauler) {
+            var name = utils.genCreepName();
+            Memory.spawningQueue.push({
+                type: 'hauler',
+                name: name,
+                memory: {
+                    job: {
+                        type: 'hauling',
+                        targets: _.filter(Game.flags, function (flag) {
+                            return Memory.flags[flag.name].type === 'miningSpot' && flag.pos.roomName === spawn.pos.roomName;
+                        }),
+                        lastTargetIndex: 0
+                    },
+                    spawn: spawn.name,
+                    type: 'hauler',
+                    state: 0
+                }
+            });
+            spawn.room.memory.hauler = name;
+        }
     },
 
     maintenanceOp: function (spawn) {//builds, repairs and upgrades
