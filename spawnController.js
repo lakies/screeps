@@ -67,11 +67,19 @@ module.exports = {
                 Memory.spawningQueue.push({
                     type: 'miner',
                     name: name,
-                    memory: {job: job, spawn: spawn.name, type: 'miner'}
+                    memory: {
+                        job: {type: 'move', toPos: job.spot, nextJob: job},
+                        spawn: spawn.name,
+                        type: 'miner',
+                        trackTime: true,
+                        spawnTime: Game.time
+                    }
                 });
             }
 
         }
+
+
     },
 
     maintenanceOp: function (spawn) {//builds, repairs and upgrades

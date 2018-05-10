@@ -40,6 +40,9 @@ module.exports = {
 
         if (creep.pos.isEqualTo(newPos) || (job.toNear && creep.pos.isNearTo(newPos))) {
             creep.memory.job = job.nextJob; //it may be undefined, use that for idle creeps?
+            if(creep.memory.trackTime){
+                creep.memory.arriveTime = Game.time - creep.memory.spawntime;
+            }
         } else {
             creep.moveTo(newPos);
         }
@@ -52,6 +55,7 @@ module.exports = {
         var job = creep.memory.job;
         var result = creep.harvest(Game.getObjectById(job.target_id));
 
+        
         if (result === ERR_NOT_IN_RANGE) {
             creep.memory.job = {type: 'move', toPos: job.spot, nextJob: job}
         }
