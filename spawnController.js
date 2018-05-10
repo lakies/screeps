@@ -17,16 +17,15 @@ module.exports = {
 
         var mem = Memory.spawns[spawn.name];
 
-        if(!mem.oneTime){//stuff to do only on setup, maybe move to another place
+        if (!mem.oneTime) {//stuff to do only on setup, maybe move to another place
             mem.oneTime = true;
 
             var sources = spawn.room.find(FIND_SOURCES);
-            for(var i in sources){
+            for (var i in sources) {
                 console.log('Flagging source');
-                utils.flagSources(sources[i],spawn.name);
+                utils.flagSources(sources[i], spawn.name);
             }
         }
-
 
 
         if (mem.creeps === undefined) {//if spawning new creep then should probably add creep manually to mem because this does not update automatically
@@ -47,11 +46,30 @@ module.exports = {
 
     miningOp: function (spawn) {
         //TODO: if spawning miners then first job should be move to target flag
-        var unassigned = _.filter(Game.flags,function (flag) {
-            return Memory.flags[flag.name].spawn === spawn.name && Memory.flags[flag.name].assignedMiner === null;
+        var unassigned = _.filter(Game.flags, function (flag) {
+            return Memory.flags[flag.name].type === 'miningSpot' && Memory.flags[flag.name].spawn === spawn.name && Memory.flags[flag.name].assignedMiner === null;
         });
 
-        if(unassigned.length > 0){
+        //console.log(unassigned[0]);
+        if (unassigned.length > 0) {//checks if have to spawn miner and then spawns one
+            var flag = unassigned.pop();
+            if (_.filter(Memory.spawningQueue, function (obj) {
+                    return JSON.stringify(obj.memory.job.spot) === JSON.stringify(flag.pos);
+                }).length === 0) {//place miner in queue
+                var job = {
+                    type: 'mining',
+                    receiver: 'miner',
+                    spot: flag.pos,
+                    target_id: Memory.flags[flag.name].source_id
+                };
+                var name = utils.genCreepName();
+                Memory.flags[flag.name].assignedMiner = name;
+                Memory.spawningQueue.push({
+                    type: 'miner',
+                    name: name,
+                    memory: {job: job, spawn: spawn.name, type: 'miner'}
+                });
+            }
 
         }
     },

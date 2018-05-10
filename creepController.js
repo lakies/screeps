@@ -1,5 +1,6 @@
 module.exports = {
     run: function (creep) { //TODO: add check for time to live and do something about it
+
         if (creep.spawning) return;
         if (creep.memory.job !== undefined) {
             switch (creep.memory.job.type) {
@@ -11,16 +12,16 @@ module.exports = {
                 case 'genericMining':
                     this.genericMiner(creep);
                     break;
-                case 'miner':
+                case 'mining':
                     this.miner(creep);
                     break;
-                case 'hauler':
+                case 'hauling':
                     this.hauler(creep);
                     break;
-                case 'mover':
+                case 'moving':
                     this.mover(creep);
                     break;
-                case 'upgrader':
+                case 'upgrading':
                     this.upgrader(creep);
                     break;
             }

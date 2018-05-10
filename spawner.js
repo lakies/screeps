@@ -42,7 +42,13 @@ module.exports = {
                     }
                     break;
             }
-            var name = utils.hash(JSON.stringify(memory) + Date.now());
+
+            var name;
+            if(newCreep.name){
+                name = newCreep.name;
+            }else{
+                name = utils.genCreepName();
+            }
 
             var result = spawn.spawnCreep(body, name, {memory: memory, dryRun: true});
 

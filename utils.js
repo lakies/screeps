@@ -8,18 +8,18 @@
  */
 
 module.exports = {
-    flagSources: function (source, spawnName) {//places a flag near source for mining
+    flagSources: function (source, spawnName) {//places a flag near source for mining, does not work when there is already a container
         var p = source.pos;
         for (var x = Math.max(p.x - 1, 0); x < Math.min(p.x + 2, 50); x++) {
             for (var y = Math.max(p.y - 1, 0); y < Math.min(p.y + 2, 50); y++) {
                 if (Game.getObjectById(source.id).room.lookAt(x, y).filter(function (a) {
-                        return a.type === "terrain" && a.terrain === "wall";
+                        return a.type === "terrain" && a.terrain === "wall" || a.type === 'structure' || a.type === 'source';//maybe add check for flags aswell
 
                     }).length === 0) {
                     var spot = new RoomPosition(x, y, source.room.name);
 
                     this.placeFlag(spot, {
-                        memory: {type: 'miningSpot', spawn: spawnName, assignedMiner: null},
+                        memory: {type: 'miningSpot', spawn: spawnName, source_id: source.id, assignedMiner: null},
                         color1: COLOR_YELLOW
                     });
                     this.placeFlag(spot, {
@@ -110,5 +110,10 @@ module.exports = {
             }
         }
         return String(a);
+    },
+
+    genCreepName: function () {
+        return this.hash(Date.now());
     }
+
 };
